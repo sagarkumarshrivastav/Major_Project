@@ -13,11 +13,11 @@ const Index = () => {
             Lost something on campus?
           </h1>
           <p className="text-xl text-slate-600 dark:text-slate-300">
-            Campus Finds & Claims helps you reunite with your lost items or return
+            Lost & Found helps you reunite with your lost items or return
             found items to their rightful owners.
           </p>
           <div className="flex flex-col sm:flex-row space-y-3 sm:space-y-0 sm:space-x-4 pt-4">
-            <Button asChild size="lg" className="bg-campus-blue hover:bg-blue-600">
+            <Button asChild size="lg" className="bg-purple-600 hover:bg-purple-700">
               <Link to="/report-lost">Report a Lost Item</Link>
             </Button>
             <Button asChild size="lg" variant="outline">
@@ -42,7 +42,7 @@ const Index = () => {
           
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             <div className="bg-white dark:bg-slate-800 p-6 rounded-lg shadow-md">
-              <div className="bg-campus-blue text-white w-10 h-10 rounded-full flex items-center justify-center mb-4">1</div>
+              <div className="bg-purple-600 text-white w-10 h-10 rounded-full flex items-center justify-center mb-4">1</div>
               <h3 className="text-xl font-bold mb-2">Report</h3>
               <p className="text-slate-600 dark:text-slate-300">
                 Quickly report a lost or found item with details and an image
@@ -50,7 +50,7 @@ const Index = () => {
             </div>
             
             <div className="bg-white dark:bg-slate-800 p-6 rounded-lg shadow-md">
-              <div className="bg-campus-blue text-white w-10 h-10 rounded-full flex items-center justify-center mb-4">2</div>
+              <div className="bg-purple-600 text-white w-10 h-10 rounded-full flex items-center justify-center mb-4">2</div>
               <h3 className="text-xl font-bold mb-2">Match</h3>
               <p className="text-slate-600 dark:text-slate-300">
                 Our system finds potential matches between lost and found items
@@ -58,7 +58,7 @@ const Index = () => {
             </div>
             
             <div className="bg-white dark:bg-slate-800 p-6 rounded-lg shadow-md">
-              <div className="bg-campus-blue text-white w-10 h-10 rounded-full flex items-center justify-center mb-4">3</div>
+              <div className="bg-purple-600 text-white w-10 h-10 rounded-full flex items-center justify-center mb-4">3</div>
               <h3 className="text-xl font-bold mb-2">Claim</h3>
               <p className="text-slate-600 dark:text-slate-300">
                 Verify and claim your item through our secure process
@@ -67,7 +67,7 @@ const Index = () => {
           </div>
           
           <div className="mt-12 text-center">
-            <Button asChild variant="default" size="lg" className="bg-campus-blue hover:bg-blue-600">
+            <Button asChild variant="default" size="lg" className="bg-purple-600 hover:bg-purple-700">
               <Link to="/lost-items">Browse Lost & Found Items</Link>
             </Button>
           </div>
@@ -76,11 +76,11 @@ const Index = () => {
 
       {/* CTA Section */}
       <div className="py-16">
-        <div className="bg-campus-amber text-white p-8 rounded-xl">
+        <div className="bg-amber-500 text-white p-8 rounded-xl">
           <div className="text-center">
             <h2 className="text-3xl font-bold mb-4">Ready to find what you've lost?</h2>
             <p className="text-xl mb-6">Join our community and get connected with your lost items.</p>
-            <Button asChild size="lg" variant="default" className="bg-white text-campus-amber hover:bg-gray-100">
+            <Button asChild size="lg" variant="default" className="bg-white text-amber-500 hover:bg-gray-100">
               <Link to="/register">Create an Account</Link>
             </Button>
           </div>

@@ -1,6 +1,7 @@
 
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
+import { ThemeToggle } from "@/components/theme/theme-toggle";
 import {
   NavigationMenu,
   NavigationMenuContent,
@@ -31,50 +32,53 @@ const Navbar = () => {
     return (
       <div className="fixed top-0 left-0 right-0 z-50 flex items-center justify-between p-4 bg-white border-b shadow-sm dark:bg-gray-900 dark:border-gray-800">
         <Link to="/" className="flex items-center space-x-2">
-          <span className="font-bold text-lg text-campus-blue">Campus Finds & Claims</span>
+          <span className="font-bold text-lg text-purple-600">Lost & Found</span>
         </Link>
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button variant="ghost" size="icon">
-              <Menu className="w-5 h-5" />
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end" className="w-56">
-            <DropdownMenuLabel>Navigation</DropdownMenuLabel>
-            <DropdownMenuSeparator />
-            <DropdownMenuItem asChild>
-              <Link to="/lost-items">Lost Items</Link>
-            </DropdownMenuItem>
-            <DropdownMenuItem asChild>
-              <Link to="/found-items">Found Items</Link>
-            </DropdownMenuItem>
-            <DropdownMenuSeparator />
-            {currentUser ? (
-              <>
-                <DropdownMenuItem asChild>
-                  <Link to="/report-lost">Report Lost</Link>
-                </DropdownMenuItem>
-                <DropdownMenuItem asChild>
-                  <Link to="/report-found">Report Found</Link>
-                </DropdownMenuItem>
-                <DropdownMenuItem asChild>
-                  <Link to="/dashboard">Dashboard</Link>
-                </DropdownMenuItem>
-                <DropdownMenuSeparator />
-                <DropdownMenuItem onClick={logout}>Logout</DropdownMenuItem>
-              </>
-            ) : (
-              <>
-                <DropdownMenuItem asChild>
-                  <Link to="/login">Login</Link>
-                </DropdownMenuItem>
-                <DropdownMenuItem asChild>
-                  <Link to="/register">Register</Link>
-                </DropdownMenuItem>
-              </>
-            )}
-          </DropdownMenuContent>
-        </DropdownMenu>
+        <div className="flex items-center space-x-2">
+          <ThemeToggle />
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="ghost" size="icon">
+                <Menu className="w-5 h-5" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" className="w-56">
+              <DropdownMenuLabel>Navigation</DropdownMenuLabel>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem asChild>
+                <Link to="/lost-items">Lost Items</Link>
+              </DropdownMenuItem>
+              <DropdownMenuItem asChild>
+                <Link to="/found-items">Found Items</Link>
+              </DropdownMenuItem>
+              <DropdownMenuSeparator />
+              {currentUser ? (
+                <>
+                  <DropdownMenuItem asChild>
+                    <Link to="/report-lost">Report Lost</Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem asChild>
+                    <Link to="/report-found">Report Found</Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem asChild>
+                    <Link to="/dashboard">Dashboard</Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem onClick={logout}>Logout</DropdownMenuItem>
+                </>
+              ) : (
+                <>
+                  <DropdownMenuItem asChild>
+                    <Link to="/login">Login</Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem asChild>
+                    <Link to="/register">Register</Link>
+                  </DropdownMenuItem>
+                </>
+              )}
+            </DropdownMenuContent>
+          </DropdownMenu>
+        </div>
       </div>
     );
   }
@@ -83,7 +87,7 @@ const Navbar = () => {
     <div className="sticky top-0 z-50 w-full bg-white border-b shadow-sm dark:bg-gray-900 dark:border-gray-800">
       <div className="container flex items-center justify-between h-16">
         <Link to="/" className="flex items-center space-x-2">
-          <span className="font-bold text-xl text-campus-blue">Campus Finds & Claims</span>
+          <span className="font-bold text-xl text-purple-600">Lost & Found</span>
         </Link>
         <NavigationMenu>
           <NavigationMenuList>
@@ -123,16 +127,15 @@ const Navbar = () => {
             </NavigationMenuItem>
             {currentUser ? (
               <NavigationMenuItem>
-                <Link to="/dashboard" legacyBehavior passHref>
-                  <NavigationMenuLink className={navigationMenuTriggerStyle()}>
-                    Dashboard
-                  </NavigationMenuLink>
-                </Link>
+                <NavigationMenuLink className={navigationMenuTriggerStyle()} asChild>
+                  <Link to="/dashboard">Dashboard</Link>
+                </NavigationMenuLink>
               </NavigationMenuItem>
             ) : null}
           </NavigationMenuList>
         </NavigationMenu>
         <div className="flex items-center space-x-4">
+          <ThemeToggle />
           {currentUser ? (
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
@@ -154,7 +157,7 @@ const Navbar = () => {
               <Button variant="ghost" asChild>
                 <Link to="/login">Login</Link>
               </Button>
-              <Button asChild className="bg-campus-blue hover:bg-blue-600">
+              <Button asChild className="bg-purple-600 hover:bg-purple-700">
                 <Link to="/register">Register</Link>
               </Button>
             </div>

@@ -79,7 +79,7 @@ const LostItems = () => {
     <Layout>
       <div className="flex flex-col md:flex-row items-center justify-between mb-6">
         <h1 className="text-3xl font-bold">Lost Items</h1>
-        <Button asChild className="mt-4 md:mt-0 bg-campus-blue hover:bg-blue-600">
+        <Button asChild className="mt-4 md:mt-0 bg-purple-600 hover:bg-purple-700">
           <Link to="/report-lost">Report a Lost Item</Link>
         </Button>
       </div>
