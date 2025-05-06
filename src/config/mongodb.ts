@@ -1,42 +1,24 @@
 
-import { MongoClient, ServerApiVersion } from "mongodb";
+// This file is kept for compatibility but doesn't actually connect to MongoDB in browser
+// In a real implementation, this would be a server-side script
 
-// Connection URI (replace with your MongoDB connection string)
-const uri = process.env.MONGODB_URI || "mongodb://localhost:27017/lostfound";
-
-// Create a MongoClient with options
-const client = new MongoClient(uri, {
-  serverApi: {
-    version: ServerApiVersion.v1,
-    strict: true,
-    deprecationErrors: true,
-  },
-});
-
-// Connect to MongoDB
+// Mock MongoDB client for browser compatibility
 export async function connectToMongo() {
-  try {
-    await client.connect();
-    console.log("Connected to MongoDB");
-    return client.db();
-  } catch (error) {
-    console.error("MongoDB connection error:", error);
-    throw error;
-  }
+  console.log("Mock MongoDB connection for browser development");
+  return {};
 }
 
-// Get database instance
+// Get mock database instance
 export function getDb() {
-  return client.db();
+  return {};
 }
 
-// Close MongoDB connection
+// Close mock MongoDB connection
 export async function closeMongoConnection() {
-  await client.close();
-  console.log("MongoDB connection closed");
+  console.log("Mock MongoDB connection closed");
 }
 
-// Collections
+// Collections names (for consistency)
 export const collections = {
   users: "users",
   lostItems: "lostItems",

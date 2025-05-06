@@ -1,15 +1,21 @@
 
-import { MongoClient, ObjectId, GridFSBucket } from "mongodb";
-import { connectToMongo, getDb, collections } from "@/config/mongodb";
 import { Item, ItemFormData, ItemStatus, ItemType } from "@/types";
 
-// Initialize MongoDB connection
-let isInitialized = false;
+// For development, we'll use localStorage
+// In production, this would be replaced with actual MongoDB calls via an API
 
-export const initMongo = async () => {
-  if (!isInitialized) {
-    await connectToMongo();
-    isInitialized = true;
+// Helper to generate IDs
+const generateId = (): string => {
+  return Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
+};
+
+// Initialize storage
+const initStorage = () => {
+  if (!localStorage.getItem('lostItems')) {
+    localStorage.setItem('lostItems', JSON.stringify([]));
+  }
+  if (!localStorage.getItem('foundItems')) {
+    localStorage.setItem('foundItems', JSON.stringify([]));
   }
 };
 
@@ -20,171 +26,129 @@ export const createItem = async (
   userId: string,
   userName: string
 ): Promise<Item> => {
-  await initMongo();
-  const db = getDb();
-
-  const now = new Date().toISOString();
+  initStorage();
   
-  const newItem = {
+  const now = new Date().toISOString();
+  const id = generateId();
+  
+  const newItem: Item = {
+    id,
     name: itemData.name,
     category: itemData.category,
     location: itemData.location,
     date: itemData.date,
     description: itemData.description,
-    imageUrl: itemData.image ? await uploadImage(itemData.image) : '/placeholder.svg',
+    imageUrl: itemData.image ? URL.createObjectURL(itemData.image) : '/placeholder.svg',
     userId,
     userName,
     contactInfo: itemData.contactInfo,
     createdAt: now,
     type,
-    status: "searching" as ItemStatus
+    status: "searching"
   };
 
-  const collection = type === "lost" 
-    ? collections.lostItems 
-    : collections.foundItems;
-
-  const result = await db.collection(collection).insertOne(newItem);
+  const collection = type === "lost" ? 'lostItems' : 'foundItems';
+  const items = JSON.parse(localStorage.getItem(collection) || '[]');
+  items.push(newItem);
+  localStorage.setItem(collection, JSON.stringify(items));
   
-  return {
-    ...newItem,
-    id: result.insertedId.toString()
-  } as Item;
+  return newItem;
 };
 
 export const getLostItems = async (): Promise<Item[]> => {
-  await initMongo();
-  const db = getDb();
-  
-  const items = await db.collection(collections.lostItems).find().toArray();
-  
-  return items.map((item) => ({
-    ...item,
-    id: item._id.toString()
-  })) as Item[];
+  initStorage();
+  return JSON.parse(localStorage.getItem('lostItems') || '[]');
 };
 
 export const getFoundItems = async (): Promise<Item[]> => {
-  await initMongo();
-  const db = getDb();
-  
-  const items = await db.collection(collections.foundItems).find().toArray();
-  
-  return items.map((item) => ({
-    ...item,
-    id: item._id.toString()
-  })) as Item[];
+  initStorage();
+  return JSON.parse(localStorage.getItem('foundItems') || '[]');
 };
 
 export const getItemById = async (id: string): Promise<Item | undefined> => {
-  await initMongo();
-  const db = getDb();
+  initStorage();
   
   // Try to find in lost items
-  let item = await db.collection(collections.lostItems).findOne({
-    _id: new ObjectId(id),
-  });
+  let lostItems = JSON.parse(localStorage.getItem('lostItems') || '[]');
+  let item = lostItems.find((item: Item) => item.id === id);
   
   // If not found, try found items
   if (!item) {
-    item = await db.collection(collections.foundItems).findOne({
-      _id: new ObjectId(id),
-    });
+    let foundItems = JSON.parse(localStorage.getItem('foundItems') || '[]');
+    item = foundItems.find((item: Item) => item.id === id);
   }
   
-  if (!item) {
-    return undefined;
-  }
-  
-  return {
-    ...item,
-    id: item._id.toString(),
-  } as Item;
+  return item;
 };
 
 export const getUserItems = async (userId: string): Promise<Item[]> => {
-  await initMongo();
-  const db = getDb();
+  initStorage();
   
-  const lostItems = await db.collection(collections.lostItems)
-    .find({ userId })
-    .toArray();
-    
-  const foundItems = await db.collection(collections.foundItems)
-    .find({ userId })
-    .toArray();
+  const lostItems = JSON.parse(localStorage.getItem('lostItems') || '[]');
+  const foundItems = JSON.parse(localStorage.getItem('foundItems') || '[]');
   
-  const allItems = [...lostItems, ...foundItems];
+  const userLostItems = lostItems.filter((item: Item) => item.userId === userId);
+  const userFoundItems = foundItems.filter((item: Item) => item.userId === userId);
   
-  return allItems.map(item => ({
-    ...item,
-    id: item._id.toString()
-  })) as Item[];
+  return [...userLostItems, ...userFoundItems];
 };
 
 export const updateItemStatus = async (
   itemId: string,
   status: ItemStatus
 ): Promise<Item | null> => {
-  await initMongo();
-  const db = getDb();
+  initStorage();
   
-  // Try to update in lost items first
-  let result = await db.collection(collections.lostItems).findOneAndUpdate(
-    { _id: new ObjectId(itemId) },
-    { $set: { status } },
-    { returnDocument: "after" }
-  );
+  // Try to update in lost items
+  let lostItems = JSON.parse(localStorage.getItem('lostItems') || '[]');
+  let itemIndex = lostItems.findIndex((item: Item) => item.id === itemId);
   
-  let item = result.value;
-  
-  // If not found in lost items, try found items
-  if (!item) {
-    result = await db.collection(collections.foundItems).findOneAndUpdate(
-      { _id: new ObjectId(itemId) },
-      { $set: { status } },
-      { returnDocument: "after" }
-    );
-    
-    item = result.value;
+  if (itemIndex !== -1) {
+    lostItems[itemIndex].status = status;
+    localStorage.setItem('lostItems', JSON.stringify(lostItems));
+    return lostItems[itemIndex];
   }
   
-  if (!item) {
-    return null;
+  // If not found, try found items
+  let foundItems = JSON.parse(localStorage.getItem('foundItems') || '[]');
+  itemIndex = foundItems.findIndex((item: Item) => item.id === itemId);
+  
+  if (itemIndex !== -1) {
+    foundItems[itemIndex].status = status;
+    localStorage.setItem('foundItems', JSON.stringify(foundItems));
+    return foundItems[itemIndex];
   }
   
-  return {
-    ...item,
-    id: item._id.toString()
-  } as Item;
+  return null;
 };
 
 export const deleteItem = async (itemId: string, userId: string): Promise<boolean> => {
-  await initMongo();
-  const db = getDb();
+  initStorage();
   
   // Try to delete from lost items
-  let result = await db.collection(collections.lostItems).deleteOne({
-    _id: new ObjectId(itemId),
-    userId: userId // Ensure user is the owner
-  });
+  let lostItems = JSON.parse(localStorage.getItem('lostItems') || '[]');
+  let initialLength = lostItems.length;
+  lostItems = lostItems.filter((item: Item) => !(item.id === itemId && item.userId === userId));
   
-  // If not deleted from lost items, try found items
-  if (result.deletedCount === 0) {
-    result = await db.collection(collections.foundItems).deleteOne({
-      _id: new ObjectId(itemId),
-      userId: userId
-    });
+  if (lostItems.length < initialLength) {
+    localStorage.setItem('lostItems', JSON.stringify(lostItems));
+    return true;
   }
   
-  return result.deletedCount > 0;
+  // If not deleted from lost items, try found items
+  let foundItems = JSON.parse(localStorage.getItem('foundItems') || '[]');
+  initialLength = foundItems.length;
+  foundItems = foundItems.filter((item: Item) => !(item.id === itemId && item.userId === userId));
+  
+  if (foundItems.length < initialLength) {
+    localStorage.setItem('foundItems', JSON.stringify(foundItems));
+    return true;
+  }
+  
+  return false;
 };
 
 export const findPotentialMatches = async (itemId: string): Promise<Item[]> => {
-  await initMongo();
-  const db = getDb();
-  
-  // First, find the item
   const item = await getItemById(itemId);
   
   if (!item) {
@@ -192,39 +156,33 @@ export const findPotentialMatches = async (itemId: string): Promise<Item[]> => {
   }
   
   // Look for potential matches in the opposite collection
-  const oppositeCollection = item.type === "lost" 
-    ? collections.foundItems 
-    : collections.lostItems;
+  const oppositeCollection = item.type === "lost" ? 'foundItems' : 'lostItems';
+  const items = JSON.parse(localStorage.getItem(oppositeCollection) || '[]');
   
   // Find items with similar category, name, or description
-  const matches = await db.collection(oppositeCollection)
-    .find({
-      $or: [
-        { category: item.category },
-        { 
-          name: { 
-            $regex: new RegExp(item.name.split(' ')[0], 'i') 
-          } 
-        },
-        {
-          description: {
-            $regex: new RegExp(item.name.split(' ')[0], 'i')
-          }
-        }
-      ]
-    })
-    .toArray();
-  
-  return matches.map(match => ({
-    ...match,
-    id: match._id.toString()
-  })) as Item[];
-};
-
-// Helper function to upload images
-const uploadImage = async (file: File): Promise<string> => {
-  // In a real implementation, this would upload to MongoDB GridFS
-  // For now, we'll just return a placeholder
-  // This would need to be implemented with proper file handling
-  return '/placeholder.svg';
+  return items.filter((potentialMatch: Item) => {
+    // Check if category matches
+    if (potentialMatch.category === item.category) {
+      return true;
+    }
+    
+    // Check if name contains similar words
+    const itemWords = item.name.toLowerCase().split(' ');
+    const matchWords = potentialMatch.name.toLowerCase().split(' ');
+    
+    for (const word of itemWords) {
+      if (word.length > 2 && matchWords.some(matchWord => matchWord.includes(word))) {
+        return true;
+      }
+    }
+    
+    // Check if description contains similar words
+    if (item.description && potentialMatch.description) {
+      return itemWords.some(word => 
+        word.length > 2 && potentialMatch.description.toLowerCase().includes(word)
+      );
+    }
+    
+    return false;
+  });
 };

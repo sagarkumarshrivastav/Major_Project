@@ -38,8 +38,12 @@ const ItemDetail = () => {
           
           // Find potential matches
           const potentialMatches = await findPotentialMatches(id);
-          // Fix the type issue by properly typing the response
-          setMatches(potentialMatches as Match[]);
+          // Convert Items to Match format
+          const formattedMatches: Match[] = potentialMatches.map(matchItem => ({
+            item: matchItem,
+            score: calculateMatchScore(fetchedItem, matchItem)
+          }));
+          setMatches(formattedMatches);
         }
       } catch (error) {
         console.error("Error fetching item:", error);
@@ -52,23 +56,31 @@ const ItemDetail = () => {
     fetchItem();
   }, [id]);
 
-  const handleClaim = async () => {
-    if (!currentUser || !item) return;
+  // Simple function to calculate match score
+  const calculateMatchScore = (item1: Item, item2: Item): number => {
+    let score = 0;
     
-    setClaiming(true);
-    try {
-      await requestClaim(item.id, currentUser.id);
-      toast.success("Claim request submitted successfully");
-      // Update local item state
-      setItem({
-        ...item,
-        status: "claimed",
-      });
-    } catch (error) {
-      toast.error("Failed to submit claim request");
-    } finally {
-      setClaiming(false);
+    // Category match gives 50 points
+    if (item1.category === item2.category) {
+      score += 50;
     }
+    
+    // Name similarity (simple check for shared words)
+    const words1 = item1.name.toLowerCase().split(/\s+/);
+    const words2 = item2.name.toLowerCase().split(/\s+/);
+    
+    for (const word of words1) {
+      if (word.length > 2 && words2.includes(word)) {
+        score += 10;
+      }
+    }
+    
+    // Location similarity
+    if (item1.location.toLowerCase() === item2.location.toLowerCase()) {
+      score += 30;
+    }
+    
+    return Math.min(100, score);
   };
 
   if (loading) {
