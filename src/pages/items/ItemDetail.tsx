@@ -11,7 +11,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { Item } from "@/types";
 import { formatDate, getCategoryDisplay, getMatchQuality } from "@/utils/itemUtils";
 import { getItemById, findPotentialMatches, requestClaim } from "@/services/itemService";
-import { MapPin, Clock, User, ArrowLeft } from "lucide-react";
+import { MapPin, Clock, User, ArrowLeft, Phone } from "lucide-react";
 
 interface Match {
   item: Item;
@@ -160,6 +160,11 @@ const ItemDetail = () => {
               <div className="flex items-center text-slate-600 dark:text-slate-300">
                 <User className="h-4 w-4 mr-2" />
                 <span>Posted by {item.userName}</span>
+              </div>
+              
+              <div className="flex items-center text-slate-600 dark:text-slate-300">
+                <Phone className="h-4 w-4 mr-2" />
+                <span>Contact: {item.contactInfo}</span>
               </div>
             </div>
             

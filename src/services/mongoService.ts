@@ -1,6 +1,6 @@
 
 import { connectToMongo, getDb, collections } from "@/config/mongodb";
-import { Item, ItemFormData, ItemType, User } from "@/types";
+import { Item, ItemFormData, ItemType, ItemStatus, User } from "@/types";
 import { ObjectId } from "mongodb";
 import { GridFSBucket } from "mongodb";
 
@@ -105,7 +105,7 @@ export const createItem = async (
     contactInfo: itemData.contactInfo,
     createdAt: new Date().toISOString(),
     type,
-    status: "searching",
+    status: "searching" as ItemStatus,
   };
   
   const result = await db.collection(collection).insertOne(newItem);
@@ -141,15 +141,10 @@ async function storeImage(file: File): Promise<string> {
   
   return new Promise((resolve, reject) => {
     // This is simplified - in a real app, you'd use proper stream handling
-    // Here we're just demonstrating the concept
-    uploadStream.end(buffer, (error) => {
-      if (error) {
-        reject(error);
-      } else {
-        // Return a URL that would serve this image
-        // In a real app, this would be a route to fetch the image by ID
-        resolve(`/api/images/${uploadStream.id}`);
-      }
+    uploadStream.write(buffer);
+    uploadStream.end(null, () => {
+      // Return a URL that would serve this image
+      resolve(`/api/images/${uploadStream.id}`);
     });
   });
 }
@@ -161,10 +156,10 @@ export const getLostItems = async (): Promise<Item[]> => {
   
   const items = await db.collection(collections.lostItems).find().toArray();
   
-  return items.map((item) => ({
+  return items.map((item: any) => ({
     ...item,
     id: item._id.toString(),
-  }));
+  })) as Item[];
 };
 
 export const getFoundItems = async (): Promise<Item[]> => {
@@ -173,10 +168,10 @@ export const getFoundItems = async (): Promise<Item[]> => {
   
   const items = await db.collection(collections.foundItems).find().toArray();
   
-  return items.map((item) => ({
+  return items.map((item: any) => ({
     ...item,
     id: item._id.toString(),
-  }));
+  })) as Item[];
 };
 
 export const getItemById = async (id: string): Promise<Item | undefined> => {
@@ -202,13 +197,60 @@ export const getItemById = async (id: string): Promise<Item | undefined> => {
   return {
     ...item,
     id: item._id.toString(),
-  };
+  } as Item;
+};
+
+// Delete an item
+export const deleteItem = async (id: string, userId: string): Promise<boolean> => {
+  await initMongo();
+  const db = getDb();
+  
+  // Try to find and delete in lost items first
+  let result = await db.collection(collections.lostItems).deleteOne({
+    _id: new ObjectId(id),
+    userId: userId, // Ensure the user owns this item
+  });
+  
+  // If not found or not deleted (not authorized), try found items
+  if (result.deletedCount === 0) {
+    result = await db.collection(collections.foundItems).deleteOne({
+      _id: new ObjectId(id),
+      userId: userId, // Ensure the user owns this item
+    });
+  }
+  
+  // Return true if deleted, false otherwise
+  return result.deletedCount > 0;
+};
+
+// Get user items
+export const getUserItems = async (userId: string): Promise<Item[]> => {
+  await initMongo();
+  const db = getDb();
+  
+  // Get lost items for this user
+  const lostItems = await db.collection(collections.lostItems)
+    .find({ userId })
+    .toArray();
+    
+  // Get found items for this user
+  const foundItems = await db.collection(collections.foundItems)
+    .find({ userId })
+    .toArray();
+    
+  // Combine and format items
+  const userItems = [
+    ...lostItems.map((item: any) => ({ ...item, id: item._id.toString() })),
+    ...foundItems.map((item: any) => ({ ...item, id: item._id.toString() }))
+  ] as Item[];
+  
+  return userItems;
 };
 
 // Update item status
 export const updateItemStatus = async (
   itemId: string,
-  newStatus: "searching" | "matched" | "claimed" | "resolved"
+  newStatus: ItemStatus
 ): Promise<Item | undefined> => {
   await initMongo();
   const db = getDb();
