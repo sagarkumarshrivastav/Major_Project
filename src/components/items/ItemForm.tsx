@@ -15,7 +15,7 @@ import {
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { toast } from "sonner";
 import { useAuth } from "@/contexts/AuthContext";
-import { createItem } from "@/services/itemService";
+import { reportLostItem, reportFoundItem } from "@/services/itemService";
 import { ItemFormData, ItemType } from "@/types";
 
 interface ItemFormProps {
@@ -96,7 +96,12 @@ const ItemForm = ({ type, title }: ItemFormProps) => {
     setIsSubmitting(true);
 
     try {
-      await createItem(formData, type, currentUser.id, currentUser.name);
+      if (type === "lost") {
+        await reportLostItem(formData, currentUser.id, currentUser.name);
+      } else {
+        await reportFoundItem(formData, currentUser.id, currentUser.name);
+      }
+      
       toast.success(
         `Your ${type} item has been reported successfully!`,
         {

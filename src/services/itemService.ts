@@ -3,7 +3,7 @@
 // For now, it's a wrapper around our MongoDB service
 import { Item, ItemFormData } from "@/types";
 import { 
-  createItem, 
+  createItem as createItemInDb, 
   getLostItems as fetchLostItems,
   getFoundItems as fetchFoundItems,
   getItemById as fetchItemById,
@@ -19,7 +19,7 @@ export const reportLostItem = async (
   userId: string,
   userName: string
 ): Promise<Item> => {
-  return createItem(itemData, "lost", userId, userName);
+  return createItemInDb(itemData, "lost", userId, userName);
 };
 
 // Report a found item
@@ -28,7 +28,19 @@ export const reportFoundItem = async (
   userId: string,
   userName: string
 ): Promise<Item> => {
-  return createItem(itemData, "found", userId, userName);
+  return createItemInDb(itemData, "found", userId, userName);
+};
+
+// Create item - exported for direct usage
+export const createItem = async (
+  itemData: ItemFormData,
+  type: "lost" | "found",
+  userId: string,
+  userName: string
+): Promise<Item> => {
+  return type === "lost" 
+    ? reportLostItem(itemData, userId, userName) 
+    : reportFoundItem(itemData, userId, userName);
 };
 
 // Get all lost items

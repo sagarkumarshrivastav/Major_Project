@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import Layout from "@/components/layout/Layout";
@@ -10,11 +9,10 @@ import { Separator } from "@/components/ui/separator";
 import { toast } from "sonner";
 import { useAuth } from "@/contexts/AuthContext";
 import AuthGuard from "@/components/auth/AuthGuard";
-import { getLostItems, getFoundItems, getUserItems } from "@/services/itemService";
+import { getLostItems, getFoundItems, getUserItems, deleteItem } from "@/services/itemService";
 import { Item } from "@/types";
 import { formatDate, getCategoryDisplay } from "@/utils/itemUtils";
-import { deleteItem } from "@/services/mongoService";
-import { trash2 as Trash, eye as Eye, list as List } from "lucide-react";
+import { Trash2 as Trash, Eye as Eye, List as List } from "lucide-react";
 import ItemGrid from "@/components/items/ItemGrid";
 import ItemFilters from "@/components/items/ItemFilters";
 
