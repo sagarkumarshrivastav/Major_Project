@@ -38,7 +38,8 @@ const ItemDetail = () => {
           
           // Find potential matches
           const potentialMatches = await findPotentialMatches(id);
-          setMatches(potentialMatches);
+          // Fix the type issue by properly typing the response
+          setMatches(potentialMatches as Match[]);
         }
       } catch (error) {
         console.error("Error fetching item:", error);
