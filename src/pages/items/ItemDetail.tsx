@@ -83,6 +83,23 @@ const ItemDetail = () => {
     return Math.min(100, score);
   };
 
+  // Handle claim button click
+  const handleClaim = async () => {
+    if (!currentUser || !id) return;
+    
+    setClaiming(true);
+    try {
+      await requestClaim(id, currentUser.id);
+      setItem(prev => prev ? { ...prev, status: "claimed" } : null);
+      toast.success("Item claimed successfully");
+    } catch (error) {
+      console.error("Error claiming item:", error);
+      toast.error("Failed to claim item");
+    } finally {
+      setClaiming(false);
+    }
+  };
+
   if (loading) {
     return (
       <Layout>

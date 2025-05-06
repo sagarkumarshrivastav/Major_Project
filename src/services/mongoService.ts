@@ -19,6 +19,18 @@ const initStorage = () => {
   }
 };
 
+// Store image as base64 string
+const storeImage = async (file: File): Promise<string> => {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      resolve(reader.result as string);
+    };
+    reader.onerror = reject;
+    reader.readAsDataURL(file);
+  });
+};
+
 // Item operations
 export const createItem = async (
   itemData: ItemFormData,
@@ -31,6 +43,11 @@ export const createItem = async (
   const now = new Date().toISOString();
   const id = generateId();
   
+  // Convert image to base64 if it exists
+  const imageUrl = itemData.image 
+    ? await storeImage(itemData.image)
+    : '/placeholder.svg';
+  
   const newItem: Item = {
     id,
     name: itemData.name,
@@ -38,7 +55,7 @@ export const createItem = async (
     location: itemData.location,
     date: itemData.date,
     description: itemData.description,
-    imageUrl: itemData.image ? URL.createObjectURL(itemData.image) : '/placeholder.svg',
+    imageUrl: imageUrl,
     userId,
     userName,
     contactInfo: itemData.contactInfo,
@@ -127,24 +144,32 @@ export const deleteItem = async (itemId: string, userId: string): Promise<boolea
   
   // Try to delete from lost items
   let lostItems = JSON.parse(localStorage.getItem('lostItems') || '[]');
-  let initialLength = lostItems.length;
-  lostItems = lostItems.filter((item: Item) => !(item.id === itemId && item.userId === userId));
   
-  if (lostItems.length < initialLength) {
+  // Find the item first to check ownership
+  const lostItem = lostItems.find((item: Item) => item.id === itemId);
+  if (lostItem && lostItem.userId === userId) {
+    // User owns this item, proceed with deletion
+    lostItems = lostItems.filter((item: Item) => item.id !== itemId);
     localStorage.setItem('lostItems', JSON.stringify(lostItems));
     return true;
+  } else if (lostItem) {
+    // Item exists but user doesn't own it
+    return false;
   }
   
-  // If not deleted from lost items, try found items
+  // If not found in lost items, try found items
   let foundItems = JSON.parse(localStorage.getItem('foundItems') || '[]');
-  initialLength = foundItems.length;
-  foundItems = foundItems.filter((item: Item) => !(item.id === itemId && item.userId === userId));
   
-  if (foundItems.length < initialLength) {
+  // Find the item first to check ownership
+  const foundItem = foundItems.find((item: Item) => item.id === itemId);
+  if (foundItem && foundItem.userId === userId) {
+    // User owns this item, proceed with deletion
+    foundItems = foundItems.filter((item: Item) => item.id !== itemId);
     localStorage.setItem('foundItems', JSON.stringify(foundItems));
     return true;
-  }
+  } 
   
+  // Item either doesn't exist or user doesn't own it
   return false;
 };
 
