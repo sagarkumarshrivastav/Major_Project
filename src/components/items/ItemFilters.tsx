@@ -93,7 +93,7 @@ const ItemFilters = ({ onFilterChange }: ItemFiltersProps) => {
             <SelectValue placeholder="Category" />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="">All Categories</SelectItem>
+            <SelectItem value="all-categories">All Categories</SelectItem>
             {categories.map((cat) => (
               <SelectItem key={cat} value={cat}>
                 {getCategoryDisplay(cat)}
@@ -110,7 +110,7 @@ const ItemFilters = ({ onFilterChange }: ItemFiltersProps) => {
             <SelectValue placeholder="Location" />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="">All Locations</SelectItem>
+            <SelectItem value="all-locations">All Locations</SelectItem>
             {locations.map((loc) => (
               <SelectItem key={loc} value={loc}>
                 {loc}

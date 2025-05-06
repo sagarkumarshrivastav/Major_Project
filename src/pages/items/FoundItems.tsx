@@ -48,12 +48,12 @@ const FoundItems = () => {
     }
 
     // Apply category filter
-    if (filters.category) {
+    if (filters.category && filters.category !== "all-categories") {
       filtered = filtered.filter((item) => item.category === filters.category);
     }
 
     // Apply location filter
-    if (filters.location) {
+    if (filters.location && filters.location !== "all-locations") {
       filtered = filtered.filter(
         (item) => item.location.toLowerCase() === filters.location.toLowerCase()
       );
