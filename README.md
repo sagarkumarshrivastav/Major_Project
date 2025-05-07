@@ -145,3 +145,5 @@ npm run build
 ```bash
 npm run preview
 ```
+
+## Git repo clone
