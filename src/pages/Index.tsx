@@ -28,7 +28,7 @@ const Index = () => {
         
         <div className="md:w-1/2 mb-8 md:mb-0">
           <img
-            src="https://images.unsplash.com/photo-1618160702438-9b02ab6515c9"
+            src="../../media/lf3.jpg"
             alt="Lost and found items"
             className="rounded-lg shadow-xl w-full h-auto max-h-[500px] object-cover"
           />

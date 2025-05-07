@@ -1,4 +1,3 @@
-
 # Lost & Found - Campus Item Recovery Application
 
 A web application to help campus users report and find lost or found items.
@@ -62,6 +61,7 @@ http://localhost:5173/
 ## Application Structure
 
 The application is built using:
+
 - React with TypeScript
 - Vite as the build tool
 - Tailwind CSS and shadcn/ui for styling
@@ -71,15 +71,18 @@ The application is built using:
 ### Key Features
 
 1. **User Authentication**
+
    - Register with name, email, and password
    - Login/logout functionality
    - Dashboard to view personal items
 
 2. **Lost Items Management**
+
    - Report lost items with details and images
    - Browse and filter lost items
 
 3. **Found Items Management**
+
    - Report found items with details and images
    - Browse and filter found items
 
@@ -90,12 +93,14 @@ The application is built using:
 ## Data Models
 
 ### User
+
 - id: string
 - email: string
 - name: string
 - password: string (hashed)
 
 ### Item
+
 - id: string
 - name: string
 - category: string
@@ -120,6 +125,7 @@ The application is built using:
 ## Customization
 
 You can customize the application by modifying:
+
 - Theme colors in the Tailwind configuration
 - Component styles in the respective component files
 - MongoDB connection settings in the `src/config/mongodb.ts` file
@@ -129,15 +135,13 @@ You can customize the application by modifying:
 For production deployment:
 
 1. Build the application
+
 ```bash
 npm run build
 ```
 
 2. Serve the built files using a static file server
+
 ```bash
 npm run preview
 ```
-
-## License
-
-This project is licensed under the MIT License - see the LICENSE file for details.

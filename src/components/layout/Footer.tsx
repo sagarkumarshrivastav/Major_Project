@@ -1,7 +1,6 @@
-
 import React from "react";
 import { Link } from "react-router-dom";
-import { Mail, Phone, Github } from "lucide-react";
+import { Mail, Phone, Github, Linkedin } from "lucide-react";
 
 const Footer = () => {
   return (
@@ -57,21 +56,39 @@ const Footer = () => {
           <ul className="space-y-2">
             <li className="flex items-center space-x-2">
               <Mail className="h-4 w-4 text-slate-600 dark:text-slate-400" />
-              <span className="text-sm text-slate-600 dark:text-slate-400">contact@lostandfound.com</span>
+              <a href="mailto:180.sagar@gmail.com" className="text-sm text-slate-600 dark:text-slate-400 hover:text-blue-600 dark:hover:text-blue-400">180.sagar@gmail.com</a>
             </li>
             <li className="flex items-center space-x-2">
               <Phone className="h-4 w-4 text-slate-600 dark:text-slate-400" />
-              <span className="text-sm text-slate-600 dark:text-slate-400">(123) 456-7890</span>
+              <a href="tel:+919999858180" className="text-sm text-slate-600 dark:text-slate-400 hover:text-blue-600 dark:hover:text-blue-400">(+91) 9999-858-180</a>
             </li>
             <li className="flex items-center space-x-2">
               <Github className="h-4 w-4 text-slate-600 dark:text-slate-400" />
-              <Link to="https://github.com" className="text-sm text-slate-600 dark:text-slate-400 hover:text-blue-600 dark:hover:text-blue-400">GitHub</Link>
+              <a
+                href="https://github.com/sagarkumarshrivastav"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-sm text-slate-600 dark:text-slate-400 hover:text-blue-600 dark:hover:text-blue-400"
+              >
+                GitHub
+              </a>
+            </li>
+            <li className="flex items-center space-x-2">
+              <Linkedin className="h-4 w-4 text-slate-600 dark:text-slate-400" />
+              <a
+                href="https://www.linkedin.com/in/sagar-kumar-shrivastav/"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-sm text-slate-600 dark:text-slate-400 hover:text-blue-600 dark:hover:text-blue-400"
+              >
+                LinkedIn
+              </a>
             </li>
           </ul>
         </div>
       </div>
       <div className="container mt-8 pt-4 border-t border-slate-200 dark:border-slate-800">
-        <p className="text-center text-sm text-slate-600 dark:text-slate-400">© 2025 Lost & Found. All rights reserved.</p>
+        <p className="text-center text-sm text-slate-600 dark:text-slate-400">© 2025 Lost & Found. All rights reserved by (Sagar Kumar Shrivastav)</p>
       </div>
     </footer>
   );
